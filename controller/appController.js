@@ -2,38 +2,6 @@ const nodemailer = require('nodemailer')
 const Mailgen = require('mailgen')
 const {EMAIL, PASSWORD} = require('../env')
 
-const signup = async (req, res) => {
-
-    let testAccount = await nodemailer.createTestAccount()
-    const transporter = nodemailer.createTransport({
-        host: "smtp.forwardemail.net",
-        port: 465,
-        secure: true,
-        auth: {
-            user: testAccount.user,
-            pass: testAccount.password,
-        },
-    });
-
-    let message ={
-        from: '"Fred Foo 👻" <foo@example.com>', // sender address
-        to: "bar@example.com, baz@example.com", // list of receivers
-        subject: "Hello ✔", // Subject line
-        text: "Hello world?", // plain text body
-        html: "<b>Hello world?</b>", // html body
-    }
-
-    transporter.sendMail(message)
-        .then(() => {
-            res.status(201).json({message:'you should receive an email'})
-        })
-        .catch(() => {
-            res.status(500).json({error:'you should receive an email'})
-        })
-
-    // res.status(201).json('Signup succes')
-}
-
 
 const getOrder = (req, res) => {
 
