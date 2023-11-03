@@ -1,4 +1,6 @@
 const nodemailer = require('nodemailer')
+const Mailgen = require('mailgen')
+const {EMAIL, PASSWORD} = require('../env')
 
 const signup = async (req, res) => {
 
@@ -23,19 +25,76 @@ const signup = async (req, res) => {
 
     transporter.sendMail(message)
         .then(() => {
-            res.status(201).json({msg:'you should receive an email'})
+            res.status(201).json({message:'you should receive an email'})
         })
         .catch(() => {
-
+            res.status(500).json({error:'you should receive an email'})
         })
 
-    res.status(201).json('Signup succes')
+    // res.status(201).json('Signup succes')
 }
-const getBill = (req, res) => {
-    res.status(201).json('GetBill succes')
+
+
+const getOrder = (req, res) => {
+
+    const {name, email, text} = req.body
+
+    let config = {
+        service: 'gmail',
+        auth: {
+            user: EMAIL,
+            pass: PASSWORD
+        }
+    }
+
+    let transporter = nodemailer.createTransport(config)
+
+    let MailGenerator = new Mailgen({
+        theme: 'default',
+        product: {
+            name: 'New order',
+            link: 'https://mailgen.js',
+        }
+    })
+
+    let response = {
+        body: {
+            name: 'Dmytro',
+            intro: 'New order',
+            table: {
+                data:[
+                    {
+                        name: name,
+                        email: email,
+                        description: text
+                    }
+                ]
+            }
+
+        }
+    }
+    let mail = MailGenerator.generate(response)
+
+    let message =  {
+        from: EMAIL,
+        to: EMAIL,
+        subject: 'Place order',
+        html: mail
+    }
+
+    transporter.sendMail(message)
+        .then(() => {
+            return res.status(201).json({
+                message: 'Mail has been sending'
+            })
+        .catch((err) => {
+            return res.status(500).json({err})
+        })
+    })
+    // res.status(201).json('GetBill succes')
 }
 
 module.exports = {
     signup,
-    getBill
+    getOrder
 }
