@@ -4,8 +4,13 @@ const {EMAIL, PASSWORD} = require('../env')
 
 
 const getOrder = (req, res) => {
-
     const {name, email, text} = req.body
+    if (!name || !email) {
+        return res.status(404).json({message: 'Wrong data'})
+    }
+
+
+    console.log(name, email, text)
 
     let config = {
         service: 'gmail',
@@ -50,19 +55,16 @@ const getOrder = (req, res) => {
         html: mail
     }
 
-    transporter.sendMail(message)
-        .then(() => {
-            return res.status(201).json({
-                message: 'Mail has been sending'
-            })
-        .catch((err) => {
-            return res.status(500).json({err})
+    transporter.sendMail(message).then(() => {
+        return res.status(201).json({
+            message: "Mail has been sending"
         })
+    }).catch(error => {
+        return res.status(500).json({ error })
     })
     // res.status(201).json('GetBill succes')
 }
 
 module.exports = {
-    signup,
     getOrder
 }
